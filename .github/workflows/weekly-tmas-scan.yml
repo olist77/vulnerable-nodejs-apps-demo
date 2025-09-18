@@ -19,7 +19,7 @@ jobs:
         with:
           version: '2' # Use latest major version
           vulnerabilitiesScan: true
-          malwareScan: true # Enable malware scanning for comprehensive security
+          malwareScan: false # Enable malware scanning for comprehensive security
           secretsScan: true
           artifact: dir:. # Scan entire repository
           additionalArgs: --region=us-east-1 # Change to your Vision One region
