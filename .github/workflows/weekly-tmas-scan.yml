@@ -1,0 +1,37 @@
+name: Weekly TMAS Security Scan
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC (adjust timezone as needed)
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  tmas-scan:
+    name: TMAS Weekly Repository Scan
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: TMAS Security Scan
+        uses: trendmicro/tmas-scan-action@v3.0.1
+        with:
+          version: '2' # Use latest major version
+          vulnerabilitiesScan: true
+          malwareScan: true # Enable malware scanning for comprehensive security
+          secretsScan: true
+          artifact: dir:. # Scan entire repository
+          additionalArgs: --region=us-east-1 # Change to your Vision One region
+          tmasApiKey: ${{ secrets.TMAS_API_KEY }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Scan Results
+        if: always() # Run even if scan finds issues
+        uses: actions/upload-artifact@v4
+        with:
+          name: tmas-scan-results-${{ github.run_number }}
+          path: |
+            tmas-scan-report.json
+            tmas-scan-report.html
+          retention-days: 7
